@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--开启扫描controller层-->
+    <context:component-scan base-package="com.qf">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <bean name="internalResourceViewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    </bean>
+
+    <!--上传文件-->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设定默认编码 -->
+        <property name="defaultEncoding" value="UTF-8"></property>
+        <!-- 设定文件上传的最大值5MB，5*1024*1024 -->
+        <property name="maxUploadSize" value="5242880"></property>
+    </bean>
+    <!--扫描静态资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+    <!--注解支持-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+    <!--    &lt;!&ndash;配置拦截器&ndash;&gt;-->
+    <!--    <mvc:interceptors>-->
+    <!--        &lt;!&ndash;配置拦截器&ndash;&gt;-->
+    <!--        <mvc:interceptor>-->
+    <!--            &lt;!&ndash;要拦截的具体的方法&ndash;&gt;-->
+    <!--            <mvc:mapping path="/account/save"/>-->
+    <!--            &lt;!&ndash;不要拦截的方法-->
+    <!--            <mvc:exclude-mapping path=""/>-->
+    <!--            &ndash;&gt;-->
+    <!--            &lt;!&ndash;配置拦截器对象&ndash;&gt;-->
+    <!--            <bean class="com.qf.interceptor.MyInterceptor" />-->
+    <!--        </mvc:interceptor>-->
+    <!--    </mvc:interceptors>-->
+
+    <!--    &lt;!&ndash;    异常类配置&ndash;&gt;-->
+    <!--    <bean id="myHandleException" class="com.qf.exception.MyHandleException"/>-->
+
+</beans>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--开启注解的扫描，希望处理service和dao，controller不需要Spring框架去处理-->
+    <context:component-scan base-package="com.qf" >
+        <!--配置哪些注解不扫描-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+
+    <!--Spring整合MyBatis框架-->
+    <!--配置连接池-->
+    <bean name="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="url" value="jdbc:mysql://localhost:3306/goods"></property>
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="root"></property>
+
+    </bean>
+
+<!--    &lt;!&ndash;配置SqlSessionFactory工厂&ndash;&gt;-->
+<!--    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">-->
+<!--        <property name="dataSource" ref="dataSource" />-->
+<!--    </bean>-->
+    <bean id="sqlSessionFactoryBean" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!-- 别名处理 -->
+        <property name="typeAliasesPackage" value="com.qf.pojo"></property>
+        <property name="globalConfig" ref="globalConfiguration"></property>
+        <!-- 插件注册 -->
+        <property name="plugins">
+            <list>
+                <!-- 注册分页插件 -->
+                <bean class="com.baomidou.mybatisplus.plugins.PaginationInterceptor" />
+                <!-- 注入 SQL 性能分析插件，建议在开发环境中使用，可以在控制台查看 SQL 执行日志 -->
+                <bean class="com.baomidou.mybatisplus.plugins.PerformanceInterceptor">
+                    <property name="maxTime" value="1000" />
+                    <!--SQL 是否格式化 默认false-->
+                    <property name="format" value="true" />
+
+                </bean>
+
+                <!-- 通过sql分析断定当前是否全表操作  -->
+                <bean class="com.baomidou.mybatisplus.plugins.SqlExplainInterceptor">
+                    <property name="stopProceed" value="true"></property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <!-- 定义 MybatisPlus 的全局策略配置-->
+    <bean id ="globalConfiguration" class="com.baomidou.mybatisplus.entity.GlobalConfiguration">
+        <!-- 在 2.3 版本以后，dbColumnUnderline 默认值是 true -->
+        <property name="dbColumnUnderline" value="true"></property>
+        <!-- 全局的主键策略 -->
+        <property name="idType" value="0"></property>
+        <!-- 全局的表前缀策略配置 -->
+        <property name="tablePrefix" value="tbl_"></property>
+        <!--注入自定义全局操作-->
+<!--        <property name="sqlInjector" ref="mySqlInjector"></property>-->
+        <!--注入自定义全局操作-->
+        <property ref="logicSqlInjector"  name="sqlInjector"></property>
+        <!--注入逻辑删除全局值-->
+        <property name="logicDeleteValue" value="-1"></property>
+        <property name="logicNotDeleteValue" value="1"></property>
+    </bean>
+    <!--逻辑删除-->
+    <bean class="com.baomidou.mybatisplus.mapper.LogicSqlInjector" id="logicSqlInjector"></bean>
+
+<!--自定义全局各种方法中的删除-->
+    <bean class="com.qf.util.MySqlInjector" id="mySqlInjector"></bean>
+    <!--配置AccountDao接口所在包-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.qf.mapper"/>
+    </bean>
+
+    <!--配置Spring框架声明式事务管理-->
+    <!--配置事务管理器-->
+<!--    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+<!--        <property name="dataSource" ref="dataSource" />-->
+<!--    </bean>-->
+
+
+    <!-- 配置事务属性 -->
+<!--    <tx:advice id="txAdvice" transaction-manager="transactionManager">-->
+<!--        <tx:attributes>-->
+<!--            <tx:method name="add*" propagation="REQUIRES_NEW" />-->
+<!--            <tx:method name="update*" propagation="REQUIRES_NEW" />-->
+<!--            <tx:method name="delete*" propagation="REQUIRES_NEW" />-->
+<!--            <tx:method name="*" read-only="true"/>-->
+<!--        </tx:attributes>-->
+<!--    </tx:advice>-->
+    <!--配置AOP增强-->
+<!--    <aop:config>-->
+<!--        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.qf.service.*ServiceImpl.*(..))"/>-->
+<!--    </aop:config>-->
+
+</beans>
